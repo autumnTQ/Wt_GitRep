@@ -18,7 +18,7 @@
 *	说    明: 使用USART1与上位机通信
 ****************************************************************************************************/
 
-//十进制转换为十六进制
+//十进制转换为十六进制  
 int DectoHex(int32_t dec, unsigned char *hex, int length)   
 {
 	for(int i=length-1; i>=0; i--) 
@@ -29,7 +29,6 @@ int DectoHex(int32_t dec, unsigned char *hex, int length)
 	
 	return 0; 
 }     
-
 
 unsigned char Set_HoldingJawOpen[]               = { 0xEB,0x91,0x30,0x06,0x00,0x00,0x00,0x00 };         //设置夹爪张开
 unsigned char Set_HoldingJawClose[]              = { 0xEB,0x91,0x30,0x06,0x01,0x00,0x00,0x00 };         //设置夹爪闭合
@@ -55,9 +54,8 @@ int main(void)
 	Modbus_Init();                       //MODBUS初始化--本机做作为从机设备地址，本机要匹配的从机地址
     uart_init3(9600);
     
-    //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-    
+    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);     //设置NVIC中断分组2:2位抢占优先级，2位响应优先级
+
     val1 = (unsigned char)val;
 	
 	while (1)
