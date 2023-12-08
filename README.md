@@ -1,5 +1,4 @@
 # test
 测试GitHub是否正常
 是正常的
-增加修改
-准备提交到远程仓库
+git clone
