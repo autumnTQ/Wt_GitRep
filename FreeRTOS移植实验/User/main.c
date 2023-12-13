@@ -28,7 +28,7 @@
 #include "./MALLOC/malloc.h"
 #include "freertos_demo.h"
 
-int main(void)
+int main(void)                          //增加注释
 {
     HAL_Init();                         /* 初始化HAL库 */
     sys_stm32_clock_init(336, 8, 2, 7); /* 设置时钟,168Mhz */
