@@ -1652,7 +1652,7 @@ __STATIC_INLINE void NVIC_SystemReset(void)
 
 /* ##################################    SysTick function  ############################################ */
 /** \ingroup  CMSIS_Core_FunctionInterface
-    \defgroup CMSIS_Core_SysTickFunctions SysTick Functions
+    \defgroup CMSIS_Core_SysTickFunctions SysTick Fun ctions
     \brief      Functions that configure the System.
   @{
  */

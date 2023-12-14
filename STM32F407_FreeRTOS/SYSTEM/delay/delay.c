@@ -52,20 +52,30 @@ void SysTick_Handler(void)
 //当使用OS的时候,此函数会初始化OS的时钟节拍
 //SYSTICK的时钟固定为AHB时钟的1/8
 //SYSCLK:系统时钟频率
-void delay_init(u8 SYSCLK)
+void delay_init(u8 SYSCLK)                             
 {
 #if SYSTEM_SUPPORT_OS 						//如果需要支持OS.
 	u32 reload;
 #endif
- 	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8); 
-	fac_us=SYSCLK;						//不论是否使用OS,fac_us都需要使用
-#if SYSTEM_SUPPORT_OS 						//如果需要支持OS.
-	reload=SYSCLK;						//每秒钟的计数次数 单位为M	   
-	reload*=1000000/configTICK_RATE_HZ;	//根据delay_ostickspersec设定溢出时间
-											//reload为24位寄存器,最大值:16777216,在168M下,约合0.7989s左右	
-	SysTick->CTRL|=SysTick_CTRL_TICKINT_Msk;   	//开启SYSTICK中断
-	SysTick->LOAD=reload; 					//每1/delay_ostickspersec秒中断一次	
-	SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk; 	//开启SYSTICK    
+/******************************************************************************************
+SySTick_Config，SysTick_CLKSourceConfig。SySTick_Config函数是总体给中断初始化一下，
+初始化的过程中它给systick的时钟配置成了默认的AHB时钟，还可以配置成AHB的八分频，这
+就需要用到SysTick_CLKSourceConfig这个函数     
+
+AHB最大时钟为168MHz，APB2高速时钟最大频率为84MHz，而APB1低速时钟最大频率为42MHz 
+————————————————
+版权声明：本文为CSDN博主「hhhjb2」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/hhhjb2/article/details/114435638
+********************************************************************************************/
+ 	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK_Div8);    //168/8 = 21M 
+	fac_us=SYSCLK;						                     //不论是否使用OS,fac_us都需要使用
+#if SYSTEM_SUPPORT_OS 						                 //如果需要支持OS.
+	reload=SYSCLK;						                     //每秒钟的计数次数 单位为M	   
+	reload*=1000000/configTICK_RATE_HZ;	                     //根据delay_ostickspersec设定溢出时间
+                                                             //reload为24位寄存器,最大值:16777216,在168M下,约合0.7989s左右	
+	SysTick->CTRL|=SysTick_CTRL_TICKINT_Msk;   	             //开启SYSTICK中断
+	SysTick->LOAD=reload; 					                 //每1/delay_ostickspersec秒中断一次	
+	SysTick->CTRL|=SysTick_CTRL_ENABLE_Msk; 	             //开启SYSTICK    
 #endif
 }								    
 
