@@ -73,7 +73,7 @@ void freertos_demo(void)
 
 /**
  * @brief       start_task
- * @param       pvParameters : 传入参数(未用到)
+ * @param       pvParameters : 传入参数(未用到) 
  * @retval      无
  */
 void start_task(void *pvParameters)
