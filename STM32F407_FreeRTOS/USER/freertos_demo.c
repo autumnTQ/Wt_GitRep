@@ -47,7 +47,7 @@ void task1(void *pvParameters);             /* 任务函数 */
 /* TASK2 任务 配置
  * 包括: 任务句柄 任务优先级 堆栈大小 创建任务
  */
-#define TASK2_PRIO      3                   /* 任务优先级 */
+#define TASK2_PRIO      2                   /* 任务优先级 */
 #define TASK2_STK_SIZE  128                 /* 任务堆栈大小 */
 TaskHandle_t            Task2Task_Handler;  /* 任务句柄 */
 void task2(void *pvParameters);             /* 任务函数 */
@@ -60,7 +60,7 @@ void task2(void *pvParameters);             /* 任务函数 */
  * @retval      无
  */
 void freertos_demo(void)
-{    
+{  
     xTaskCreate((TaskFunction_t )start_task,            /* 任务函数 */
                 (const char*    )"start_task",          /* 任务名称 */
                 (uint16_t       )START_STK_SIZE,        /* 任务堆栈大小 */
@@ -69,6 +69,7 @@ void freertos_demo(void)
                 (TaskHandle_t*  )&StartTask_Handler);   /* 任务句柄 */
     vTaskStartScheduler();
 }
+
 
 /**
  * @brief       start_task
@@ -92,6 +93,7 @@ void start_task(void *pvParameters)
                 (void*          )NULL,
                 (UBaseType_t    )TASK2_PRIO,
                 (TaskHandle_t*  )&Task2Task_Handler);
+                
     vTaskDelete(StartTask_Handler); /* 删除开始任务 */
     taskEXIT_CRITICAL();            /* 退出临界区 */
 }
@@ -105,7 +107,7 @@ void task1(void *pvParameters)
 {    
     while(1)
     {
-        printf("number");
+        printf("task1运行!!!\r\n");
         vTaskDelay(1000);                                               /* 延时1000ticks */
     }
 }
@@ -117,12 +119,9 @@ void task1(void *pvParameters)
  */
 void task2(void *pvParameters)
 {
-    float float_num = 0.0;
-    
     while(1)
     {
-        float_num += 0.01f;                         /* 更新数值 */
-        printf("float_num: %0.4f\r\n", float_num);  /* 打印数值 */
-        vTaskDelay(1000);                           /* 延时1000ticks */
+        printf("task2运行!!!\r\n");
+        vTaskDelay(1000);                                               /* 延时1000ticks */
     }
 }

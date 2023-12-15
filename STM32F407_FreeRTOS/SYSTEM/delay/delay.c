@@ -79,7 +79,7 @@ AHB最大时钟为168MHz，APB2高速时钟最大频率为84MHz，而APB1低速时钟最大频率为42MHz
 #endif
 }								    
 
-#if SYSTEM_SUPPORT_OS 						//如果需要支持OS.
+#if SYSTEM_SUPPORT_OS 						//如果需要支持OS.       
 //延时nus
 //nus:要延时的us数.	
 //nus:0~204522252(最大值即2^32/fac_us@fac_us=21)	    								   

@@ -1300,7 +1300,8 @@ void vTaskStartScheduler( void ) PRIVILEGED_FUNCTION;
  * void vAFunction( void )
  * {
  *   // Create at least one task before starting the kernel.
- *   xTaskCreate( vTaskCode, "NAME", STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL );
+ *   xTaskCreate( vTaskCode, "NAME", STACK_SIZE, NULL, tskIDLE_PRIORI
+ TY, NULL );
  *
  *   // Start the real time kernel with preemption.
  *   vTaskStartScheduler ();
