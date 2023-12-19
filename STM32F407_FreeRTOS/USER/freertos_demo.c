@@ -79,6 +79,7 @@ void freertos_demo(void)
 void start_task(void *pvParameters)
 {
     taskENTER_CRITICAL();           /* 进入临界区 */
+     
     /* 创建任务1 */
     xTaskCreate((TaskFunction_t )task1,
                 (const char*    )"task1",
@@ -93,7 +94,7 @@ void start_task(void *pvParameters)
                 (void*          )NULL,
                 (UBaseType_t    )TASK2_PRIO,
                 (TaskHandle_t*  )&Task2Task_Handler);
-                
+                                
     vTaskDelete(StartTask_Handler); /* 删除开始任务 */
     taskEXIT_CRITICAL();            /* 退出临界区 */
 }
