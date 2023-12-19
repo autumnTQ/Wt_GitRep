@@ -24,6 +24,7 @@
 /*FreeRTOS*********************************************************************************************/
 #include "FreeRTOS.h"
 #include "task.h"
+#include "list.h"
 
 /******************************************************************************************************/
 /*FreeRTOS配置*/
@@ -53,6 +54,11 @@ TaskHandle_t            Task2Task_Handler;  /* 任务句柄 */
 void task2(void *pvParameters);             /* 任务函数 */
 
 /******************************************************************************************************/
+
+List_t         TestList;     //定义测试列表
+ListItem_t     ListItem1;    //定义测试列表项1
+ListItem_t     ListItem2;    //定义测试列表项2
+ListItem_t     ListItem3;    //定义测试列表项3
 
 /**
  * @brief       FreeRTOS例程入口函数
@@ -114,15 +120,53 @@ void task1(void *pvParameters)
 }
 
 /**
- * @brief       task2
+ * @brief       task2 实现列表项插入和删除
  * @param       pvParameters : 传入参数(未用到)
  * @retval      无
  */
 void task2(void *pvParameters)
-{
+{   
+    
+    vListInitialise(&TestList);        //初始化列表
+    vListInitialiseItem(&ListItem1);   //初始化列表项
+    vListInitialiseItem(&ListItem2);   //初始化列表项
+    vListInitialiseItem(&ListItem3);   //初始化列表项
+    
+    ListItem1.xItemValue = 40;         //配置列表项的值
+    ListItem2.xItemValue = 60;
+    ListItem3.xItemValue = 50;
+    
+    /* 第二步：打印列表和其他列表项的地址 */
+    printf("/**************第二步：打印列表和列表项的地址**************/\r\n");
+    printf("项目\t\t\t地址\r\n");
+    printf("TestList\t\t0x%p\t\r\n", &TestList);
+    printf("TestList->pxIndex\t0x%p\t\r\n", TestList.pxIndex);
+    printf("TestList->xListEnd\t0x%p\t\r\n", (&TestList.xListEnd));
+    printf("ListItem1\t\t0x%p\t\r\n", &ListItem1);
+    printf("ListItem2\t\t0x%p\t\r\n", &ListItem2);
+    printf("ListItem3\t\t0x%p\t\r\n", &ListItem3);
+    printf("/**************************结束***************************/\r\n");
+    
+    /* 第三步：列表项1插入列表 */
+    printf("/r/n/*****************第三步：列表项1插入列表******************/\r\n");
+    vListInsert((List_t*    )&TestList,         /* 列表 */    //升序插入列表
+                (ListItem_t*)&ListItem1);       /* 列表项 */
+                
+    printf("项目\t\t\t\t地址\r\n");
+    printf("TestList->xListEnd->pxNext\t0x%p\r\n", (TestList.xListEnd.pxNext));          //列表中最后一个列表项指向的下一个列表项
+    printf("ListItem1->pxNext\t\t0x%p\r\n", (ListItem1.pxNext));                         //列表项1指向的下一个列表项
+    printf("TestList->xListEnd->pxPrevious\t0x%p\r\n", (TestList.xListEnd.pxPrevious));  //列表中最后一个列表项指向的上一个
+    printf("ListItem1->pxPrevious\t\t0x%p\r\n", (ListItem1.pxPrevious));                 //列表项1指向的上一个
+    printf("/**************************结束***************************/\r\n");
     while(1)
     {
         printf("task2运行!!!\r\n");
         vTaskDelay(1000);                                               /* 延时1000ticks */
     }
 }
+
+
+
+
+
+
