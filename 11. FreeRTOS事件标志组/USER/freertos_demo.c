@@ -26,6 +26,7 @@
 #include "task.h"
 #include "queue.h"
 #include "semphr.h"
+#include "event_groups.h"
 
 /******************************************************************************************************/
 /*FreeRTOS配置*/
@@ -54,10 +55,10 @@ void task1(void *pvParameters); /* 任务函数 */
 TaskHandle_t Task2Task_Handler; /* 任务句柄 */
 void task2(void *pvParameters); /* 任务函数 */
 /******************************************************************************************************/
+EventGroupHandle_t eventgroup_handle; // 事件标志组的句柄
+#define EVENTBIT_0 0X01               // 事件
+#define EVENTBIT_1 0X02
 
-QueueSetHandle_t queueset_handle; // 队列集句柄
-QueueHandle_t queue_handle;       // 队列句柄
-QueueHandle_t semphr_handle;      // 二值信号量句柄
 /**
  * @brief       FreeRTOS例程入口函数
  * @param       无
@@ -65,17 +66,6 @@ QueueHandle_t semphr_handle;      // 二值信号量句柄
  */
 void freertos_demo(void)
 {
-    queueset_handle = xQueueCreateSet(2); // 创建队列集
-    if (queueset_handle != NULL)
-    {
-        printf("队列集queueset_handle创建成功\r\n");
-    }
-    queue_handle = xQueueCreate(1, sizeof(uint8_t)); // 创建队列
-    semphr_handle = xSemaphoreCreateBinary();        // 创建二值信号量
-
-    xQueueAddToSet(queue_handle, queueset_handle);
-    xQueueAddToSet(semphr_handle, queueset_handle);
-
     xTaskCreate((TaskFunction_t)start_task,          /* 任务函数 */
                 (const char *)"start_task",          /* 任务名称 */
                 (uint16_t)START_STK_SIZE,            /* 任务堆栈大小 */
@@ -92,7 +82,12 @@ void freertos_demo(void)
  */
 void start_task(void *pvParameters)
 {
-    taskENTER_CRITICAL(); /* 进入临界区 */
+    taskENTER_CRITICAL();                    /* 进入临界区 */
+    eventgroup_handle = xEventGroupCreate(); // 创建事件标志组
+    if (eventgroup_handle != NULL)
+    {
+        printf("事件标志组创建成功\r\n");
+    }
 
     /* 创建任务1 */
     xTaskCreate((TaskFunction_t)task1,
@@ -116,27 +111,20 @@ void start_task(void *pvParameters)
 void task1(void *pvParameters)
 {
     uint8_t serial_buf;
-    BaseType_t err = 0;
 
     while (1)
     {
         serial_buf = USART_RX_BUF[0]; // 读取串口接收到
         USART_RX_BUF[0] = 0;
-        if (serial_buf == 0x11)
+        if (serial_buf == 0x01)
         {
-            err = xQueueSend(queue_handle, &serial_buf, portMAX_DELAY); // 向队列中写入数据
-            if (err == pdPASS)
-            {
-                printf("往queue_handle写入数据成功\r\n");
-            }
+            xEventGroupSetBits(eventgroup_handle, EVENTBIT_0); // 设置事件标志组的bit0置1
+            
+//            xEventGroupSync(eventgroup_handle, EVENTBIT_1, EVENTBIT_0, portMAX_DELAY); //等待bit0置1，然后将bit1置1
         }
-        else if (serial_buf == 0x22)
+        else if (serial_buf == 0x02)
         {
-            err = xSemaphoreGive(semphr_handle); // 释放二值信号量
-            if (err == pdPASS)
-            {
-                printf("释放信号量成功\r\n");
-            }
+            xEventGroupSetBits(eventgroup_handle, EVENTBIT_1); // 设置事件标志组的bit1置1
         }
         vTaskDelay(10); /* 延时1000ticks */
     }
@@ -145,22 +133,14 @@ void task1(void *pvParameters)
 // 任务2，获取队列集的消息
 void task2(void *pvParameters)
 {
-    uint8_t serial_buf;
-    QueueSetMemberHandle_t member_handle;
-
+    EventBits_t event_bit = 0; // 等待事件标志位函数的返回值
     while (1)
     {
-        // 在任务中获取队列集中有有效消息的队列
-        member_handle = xQueueSelectFromSet(queueset_handle, portMAX_DELAY);
-        if (member_handle == queue_handle)
-        {
-            xQueueReceive(queue_handle, &serial_buf, portMAX_DELAY);
-            printf("获取到的队列数据为：%d\r\n", serial_buf);
-        }
-        else if (member_handle == semphr_handle)
-        {
-            xSemaphoreTake(semphr_handle, portMAX_DELAY);
-            printf("获取信号量成功\r\n");
-        }
+        event_bit = xEventGroupWaitBits(eventgroup_handle,       // 事件标志组句柄
+                                        EVENTBIT_0 | EVENTBIT_1, // 等待的事件标志组的bit0和bit1位
+                                        pdTRUE,                  // 成功等待到事件标志位后，清除事件
+                                        pdTRUE,                  // 是否等待所有的事件标志位都置1
+                                        portMAX_DELAY);
+        printf("等待的事件标志位值为：%#x\r\n", event_bit);
     }
 }
