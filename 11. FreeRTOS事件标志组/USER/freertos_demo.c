@@ -111,6 +111,7 @@ void start_task(void *pvParameters)
 void task1(void *pvParameters)
 {
     uint8_t serial_buf;
+    EventBits_t event_sync = 0;
 
     while (1)
     {
@@ -120,11 +121,14 @@ void task1(void *pvParameters)
         {
             xEventGroupSetBits(eventgroup_handle, EVENTBIT_0); // 设置事件标志组的bit0置1
             
-//            xEventGroupSync(eventgroup_handle, EVENTBIT_1, EVENTBIT_0, portMAX_DELAY); //等待bit0置1，然后将bit1置1
+//            event_sync = xEventGroupSync(eventgroup_handle, EVENTBIT_1, EVENTBIT_0, portMAX_DELAY); //等待bit0置1，然后将bit1置1
+//            printf("sync同步等待的事件标志位值为：%#x\r\n", event_sync);
         }
         else if (serial_buf == 0x02)
         {
             xEventGroupSetBits(eventgroup_handle, EVENTBIT_1); // 设置事件标志组的bit1置1
+            event_sync = xEventGroupSync(eventgroup_handle, EVENTBIT_0, EVENTBIT_1, portMAX_DELAY); //等待bit0置1，然后将bit1置1
+            printf("sync同步等待的事件标志位值为：%#x\r\n", event_sync);
         }
         vTaskDelay(10); /* 延时1000ticks */
     }

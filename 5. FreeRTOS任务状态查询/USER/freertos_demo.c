@@ -161,6 +161,6 @@ void task2(void *pvParameters)
 
     while(1)
     {
-        vTaskDelay(1000);                                               /* —” ±1000ticks */
+        vTaskDelay(1000);     /* —” ±1000ticks */
     }
 }
